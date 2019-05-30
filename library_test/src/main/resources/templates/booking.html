@@ -1,0 +1,125 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <script src="/js/common.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+</head>
+<body>
+<style>
+</style>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-5" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">普通用户-预约</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-5">
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/index'">查询书籍
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toCollect'">查看我的收藏
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toBorrow'">查看我的借阅
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toBookinglist'">查看我的预约
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toEditUser'">修改密码
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/'">退出
+            </a></p>
+        </div>
+        </div>
+    </div>
+</nav>
+<div class="container" id="app" style="background: #fafafa">
+
+    <div class="post">
+        <div class="form-group">
+            <label>预约时间</label>
+            <input type="text" class="form-control" id="datetimepicker"  readonly>
+        </div>
+        <button  class="btn btn-primary  btn-block" v-on:click="booking()">预约</button>
+    </div>
+
+    <!--  </div>-->
+</div>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        $("#datetimepicker").datetimepicker({
+            format: 'yyyy-mm-dd',
+            minView:2,
+            startView:2
+        });
+    });
+
+
+    var bookID=[[${bookID}]];
+    var app = new Vue({
+        el: '#app',
+        data: {
+            bookingTime: ''
+        },
+        methods: {
+            booking:function () {
+                var params={
+                    bookID:bookID,
+                    bookingTime:$('#datetimepicker').val()
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/addBooking",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            $(document).dialog({
+                                content: '预约成功',
+                            });
+                            setTimeout(function () {
+                                location.href="/toBookinglist";
+                            },1500)
+                        }else if(data.code==0){
+                            $(document).dialog({
+                                content: '你已经预约过这本书',
+                            });
+                        }
+                        else if(data.code==404){
+                            $(document).dialog({
+                                content: '预约失败',
+                            });
+                        }
+                        else {
+                            $(document).dialog({
+                                content: '连接错误',
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    });
+    function searchWithCondition() {
+        var input=$('#bookInput').val();
+        var type=$("input[name='type']:checked").val();;
+        var params={
+            input:input,
+            type:type
+        };
+        $.ajax({
+            type : "post",
+            url : "/user/getUsers",
+            data : params,
+            success : function(data) {
+                app.items=data;
+            }
+        });
+    }
+</script>
+</body>
+</html>

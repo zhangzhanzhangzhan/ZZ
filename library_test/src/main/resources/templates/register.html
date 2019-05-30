@@ -1,0 +1,95 @@
+<html>
+<head>
+    <title>注册</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <script src="/js/common.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<style>
+
+</style>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">图书借阅管理系统-用户注册</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="" >
+        <div class="shadow">
+            <form action="#" id="registerForm" name="registerForm" onsubmit="return false">
+                <div class=" " id="register" >
+                    <div><strong id="errorMsg"  style="color: red;margin-left: 18px;"></strong></div>
+                    <div class="form-group">
+                        <label for="userName">用户名：</label><input id="userName" class="form-control" placeholder="不小于8位字母或数字" name="userName"  maxlength="20" type="text" onblur="validateUserName()"required onkeydown="if(event.keyCode==32) return false">
+                        <span class="error-account" id="error-userName"></span>
+                    </div>
+                    <div class="form-group"><label for="passWord">密码：</label><input id="password" placeholder="不小于6位字母或数字" class="form-control" name="userPassword"  maxlength="10" type="password" required onkeydown="if(event.keyCode==32) return false"></div>
+
+                    <!--<label>
+                        <input type="radio"name="sex"value="1" checked> 男
+                    </label>
+                    <label>
+                        <input type="radio" name="sex" value="0"> 女
+                    </label>
+                    <div class="form-group">
+                    <select name="userType" class="form-control">
+                        <option value="1">我是学生</option>
+                        <option value="2">我是老师</option>
+                    </select>
+                    </div>-->
+                </div>
+                <a href="/">有账号？去登录</a>
+                <div class="form-group"><a  class="btn btn-primary  btn-block" onclick="registerUser()">注册</a></div>
+                <br>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+<script type="text/javascript">
+
+    function registerUser(){
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url:"/user/register",
+            data:$('#registerForm').serialize(),// 你的formid
+            async: false,
+            error: function(request) {
+                $(document).dialog({
+                    content: '连接失败',
+                });
+            },
+            success: function(data) {
+                if (data.code==200){
+                    $(document).dialog({
+                        content: '注册成功，两秒后跳转到登录页面',
+                    });
+                    setTimeout(function () {
+                        location.href="/";
+                    },1500)
+                }else{
+                    $(document).dialog({
+                        content: '该账号已存在',
+                    });
+                }
+
+            }
+        });
+
+
+    }
+
+</script>
+</body>
+
+</html>

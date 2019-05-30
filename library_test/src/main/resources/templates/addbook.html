@@ -1,0 +1,144 @@
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<style>
+</style>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-5" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">系统管理员-新增图书</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-5">
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toBooklist'">查看图书列表
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toManagerlist'">查看图书馆员列表
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/admin'">查看用户列表
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/'">退出
+            </a></p>
+        </div>
+    </div>
+</nav>
+<div class="container" id="app" style="background: #fafafa">
+
+
+    <div class="post">
+        <div class="form-group">
+            <label >书名：</label>
+            <input  class="form-control" type="text" v-model="bookName" required placeholder="书名"/>
+        </div>
+        <div class="form-group">
+            <label >作者：</label>
+            <input  class="form-control" type="text" v-model="author" required placeholder="作者"/>
+        </div>
+        <div class="form-group">
+            <label >出版时间：</label>
+            <input  class="form-control"  type="text" v-model="time" required placeholder="出版时间"/>
+        </div>
+        <div class="form-group">
+            <label >数量：</label>
+            <input  class="form-control"  type="text" v-model="amount" required placeholder="数量"/>
+        </div>
+        <div class="form-group">
+            <label >作者介绍：</label>
+            <textarea  class="form-control"  style="resize:none;" rows="5" cols="5" v-model="authorIntroduce" required placeholder="作者介绍">
+            </textarea>
+        </div>
+        <div class="form-group">
+            <label >书本介绍：</label>
+            <textarea  class="form-control"  style="resize:none;" rows="5" cols="5"   v-model="bookIntroduce" required placeholder="书本介绍">
+            </textarea>
+        </div>
+
+
+        <div class="form-group"> <button  class="btn btn-primary  btn-block" v-on:click="addBook()">新增</button></div>
+    </div>
+
+    <!--  </div>-->
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            bookName: '',
+            author:'',
+            time:'',
+            bookIntroduce:'',
+            authorIntroduce:'',
+            amount:'',
+        },
+        methods: {
+            addBook:function (bookID) {
+                var params={
+                    bookName:app.bookName,
+                    author:app.author,
+                    time:app.time,
+                    bookIntroduce:app.bookIntroduce,
+                    authorIntroduce:app.authorIntroduce,
+                    amount:app.amount,
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/addBook",
+                    data : params,
+                    success : function(data) {
+                        if (data.code==500){
+                            alert("您未登陆");
+                            location.href="/";
+                        }
+                        else if (data.code==0){
+                            $(document).dialog({
+                                content: '连接错误',
+                            });
+                        }
+                        else if(data.code==200){
+                            $(document).dialog({
+                                content: '新增成功',
+                            });
+                            setTimeout(function () {
+                                location.href="/toBooklist";
+                            },1500)
+                        }
+                        else if(data.code==404){
+                            $(document).dialog({
+                                content: '失败',
+                            });
+                        }
+                        else {
+                            $(document).dialog({
+                                content: '连接错误',
+                            });
+                        }
+                    }
+                });
+            },
+        }
+    });
+    $(document).ready(function(){
+        var params1=[]
+        $.ajax({
+            type : "post",
+            url : "/user/showBookList",
+            data : params1,
+            success : function(data) {
+                app.items=data;
+            }
+        });
+    })
+</script>
+</body>
+</html>

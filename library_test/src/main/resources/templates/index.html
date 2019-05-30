@@ -1,0 +1,224 @@
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <script src="/js/common.js"></script>
+</head>
+<style>
+
+</style>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-5" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">普通用户-查询书籍</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-5">
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/index'">查询书籍
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toCollect'">查看我的收藏
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toBorrow'">查看我的借阅
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toBookinglist'">查看我的预约
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/toEditUser'">修改密码
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/'">退出
+            </a></p>
+        </div>
+    </div>
+</nav>
+<div class="container" id="app" style="background: #fafafa">
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="查询书名" v-model="bookName" v-on:click="search()">
+                <span class="input-group-btn">
+        <button class="btn btn-default" type="button" v-on:click="search()">查询</button>
+      </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div><!-- /.row -->
+    <div class="post">
+        <table class="table table-hover">
+            <tr>
+                <td>书名</td>
+                <td>编号</td>
+                <td>作者</td>
+                <td>出版时间</td>
+                <td>数量</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(item, i) in items">
+                <td>{{item.bookName}}</td>
+                <td>{{item.bookID}}</td>
+                <td>{{item.author}}</td>
+                <td>{{item.time}}</td>
+                <td>{{item.amount}}</td>
+                <td>
+                    <button class="btn btn-info" v-on:click="collect(item.bookID)">收藏</button>
+                    <button class="btn btn-danger" v-on:click="borrow(item.bookID,item.amount)">借阅</button>
+                    <button class="btn btn-warning" v-on:click="booking(item.bookID,item.amount)">预约</button>
+                    <button class="btn btn-primary" v-on:click="bookDetail(item.authorIntroduce,item.bookIntroduce)">详情</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!--  </div>-->
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            bookName: '',
+            items: [
+            ]
+        },
+        methods: {
+            collect:function (bookID) {
+                var params={
+                    bookID:bookID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/collect",
+                    data : params,
+                    success : function(data) {
+                        if (data.code==500){
+                            $(document).dialog({
+                                content: '您未登陆',
+                            });
+                            setTimeout(function () {
+                                location.href="/";
+                            },1500)
+                        }
+                        else if (data.code==0){
+                            $(document).dialog({
+                                content: '您已经收藏过这个本书',
+                            });
+                            return false;
+                        }
+                        else if(data.code==200){
+                            $(document).dialog({
+                                content: '选择成功',
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            },1000)
+                        }
+                        else if(data.code==404){
+                            $(document).dialog({
+                                content: '失败',
+                            });
+                        }
+                        else {
+                            $(document).dialog({
+                                content: '连接错误',
+                            });
+                        }
+                    }
+                });
+            },
+            borrow:function (bookID,amount) {
+                if (amount==0){
+                    $(document).dialog({
+                        content: '图书数量为0',
+                    });
+                    return false;
+                }
+                var params={
+                    bookID:bookID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/borrow",
+                    data : params,
+                    success : function(data) {
+                        if (data.code==500){
+                            $(document).dialog({
+                                content: '您未登陆',
+                            });
+                            setTimeout(function () {
+                                location.href="/";
+                            },1500)
+                        }
+                        else if (data.code==0){
+                            $(document).dialog({
+                                content: '您已经借阅过这本书了',
+                            });
+                            return false;
+                        }
+                        else if(data.code==200){
+                            $(document).dialog({
+                                content: '选择成功',
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            },1500)
+                        }
+                        else if(data.code==404){
+                            $(document).dialog({
+                                content: '失败',
+                            });
+                        }
+                        else {
+                            $(document).dialog({
+                                content: '连接错误',
+                            });
+                        }
+                    }
+                });
+            },
+            bookDetail:function (authorIntroduce,bookIntroduce) {
+                location.href="/toBookDetail?authorIntroduce="+authorIntroduce+"&bookIntroduce="+bookIntroduce;
+            },
+            booking:function (bookID,amount) {
+                if (amount==0){
+                    $(document).dialog({
+                        content: '图书数量为0',
+                    });
+                    return false;
+                }
+                location.href="/toBooking?bookID="+bookID;
+            },
+            search:function () {
+                var params={
+                    bookName:app.bookName
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/showBookList",
+                    data : params,
+                    success : function(data) {
+                        app.items=data;
+                    }
+                });
+            }
+        }
+    });
+    $(document).ready(function(){
+        var params1=[]
+        $.ajax({
+            type : "post",
+            url : "/user/showBookList",
+            data : params1,
+            success : function(data) {
+                app.items=data;
+            }
+        });
+    })
+</script>
+</body>
+</html>

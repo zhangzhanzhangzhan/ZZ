@@ -1,0 +1,93 @@
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <script src="/js/common.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">修改密码</a>
+        </div>
+    </div>
+    </div>
+</nav>
+<body>
+<div class="container hello" style=";background-color: #fafafa;background-image: none" >
+    <div class="" >
+        <div class="shadow">
+            <form action="#" id="registerForm" name="registerForm" onsubmit="return false">
+                <div class=" " id="register" >
+                    <div><strong id="errorMsg"  style="color: red;margin-left: 18px;"></strong></div>
+                    <div class="form-group"><label for="passWord">密码：</label><input id="password" class="form-control" name="userPassword"  maxlength="10" type="password" required onkeydown="if(event.keyCode==32) return false"></div>
+                    <div class="form-group"><label for="ensurePassword">确认密码：</label><input id="ensurePassword" class="form-control" name="ensurePassword"  maxlength="10" type="password" required onkeydown="if(event.keyCode==32) return false"></div>
+
+                </div>
+                <div class="form-group">
+                    <a  class="btn btn-primary  btn-block" onclick="registerUser()">修改</a>
+                    <a  class="btn btn-primary  btn-block" href="/index">返回</a>
+                </div>
+                <br>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+<div id="alert" class="alert" style="opacity: 0.6;"></div>
+
+
+<script type="text/javascript">
+
+    function registerUser(){
+         var password=$('#password').val();
+         var ensurePassword=$('#ensurePassword').val();
+         if (password!=ensurePassword){
+             $(document).dialog({
+                 content: '两次输入的密码不一致',
+             });
+             return false;
+         }
+
+
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url:"/user/editUser",
+            data:$('#registerForm').serialize(),// 你的formid
+            async: false,
+            error: function(request) {
+                $(document).dialog({
+                    content: '连接失败',
+                });
+            },
+            success: function(data) {
+                if (data.code==200){
+                    $(document).dialog({
+                        content: '修改成功，两秒后跳转到登录页面',
+                    });
+                    setTimeout(function () {
+                        location.href="/";
+                    },1500)
+                }else{
+                    $(document).dialog({
+                        content: '该账号已存在',
+                    });
+                }
+
+            }
+        });
+
+
+    }
+
+</script>
+</body>
+
+</html>
